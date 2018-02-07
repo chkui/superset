@@ -109,20 +109,6 @@ export const controls = {
         }),
         description: t('One or many metrics to display'),
     },
-    smooths: {
-        type: 'CheckboxControl',
-        label: t('Line Smooth'),
-        default: true,
-    },
-    graph_type: {
-        type: 'SelectControl',
-        label: t('Graph Type Select'),
-        choices: [
-            ['Basic', 'Basic'],
-            ['Stack', 'Stack'],
-        ],
-        default: 'Basic',
-    },
     percent_metrics: {
         type: 'SelectControl',
         multi: true,
@@ -1848,23 +1834,67 @@ export const controls = {
             return data.result.map(o => ({value: o.id, label: o.slice_name}));
         },
     },
-    echarts_option1: {
-        type: 'SelectControl',
-        label: t('echarts_option1'),
+    smooths: {
+        type: 'CheckboxControl',
+        label: t('Line Smooth'),
+        default: true,
     },
-    echarts_option2: {
-        type: 'SelectControl',
-        label: t('echarts_option2'),
+    data_zoom: {
+        type: 'CheckboxControl',
+        label: t('Data Zoom'),
+        default: false,
     },
-    echarts_option3: {
+    graph_type: {
         type: 'SelectControl',
-        label: t('echarts_option3'),
+        label: t('Graph Type Select'),
+        choices: [
+            ['Basic', 'Basic'],
+            ['Stack', 'Stack'],
+            ['StackArea', 'StackArea'],
+            ['Area Double Axis', 'Area Double Axis'],
+        ],
+        default: 'Basic',
     },
-    echarts_option4: {
+    echarts_theme: {
         type: 'SelectControl',
-        label: t('echarts_option4'),
+        label: t('Echarts图表主题'),
+        choices: [
+            ['default'],
+            ['dark'],
+            ['infographic'],
+            ['macarons'],
+            ['roma'],
+            ['shine'],
+            ['vintage']
+        ],
+        description: t('echarts官方提供的六种主题，空白选项为默认值'),
+        default: ''
     },
-
+    echarts_option_tooltip: {
+        type: 'CheckboxControl',
+        label: t('ToolTip'),
+        default: true
+    },
+    echarts_option_toolbox: {
+        type: 'CheckboxControl',
+        label: t('ToolBox'),
+        default: false
+    },
+    echarts_option_legend: {
+        type: 'CheckboxControl',
+        label: t('Legend'),
+        default: false
+    },
+    echarts_option_dataZoom: {
+        type: 'CheckboxControl',
+        label: t('DataZoom'),
+        default: false
+    },
+    echarts_option_visualMap: {
+        type: 'CheckboxControl',
+        label: t('VisualMap'),
+        default: false
+    },
 };
 export default controls;
 

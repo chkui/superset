@@ -104,32 +104,14 @@ export const visTypes = {
                     ['percent_metrics'],
                     ['include_time'],
                     ['timeseries_limit_metric', 'order_desc'],
-                    ['graph_type'],
-                    ['smooths'],
-                ],
-            },
-            {
-                label: t('NOT GROUPED BY'),
-                description: t('Use this section if you want to query atomic rows'),
-                controlSetRows: [
-                    ['all_columns'],
-                    ['order_by_cols'],
-                ],
-            },
-            {
-                label: t('Options'),
-                controlSetRows: [
-                    ['table_timestamp_format'],
-                    ['row_limit', 'page_length'],
-                    ['include_search', 'table_filter'],
                 ],
             },
             {
                 label: t('Echarts Options'),
                 controlSetRows: [
-                    ['echarts_option1', 'echarts_option2'],
-                    ['echarts_option3'],
-                    ['echarts_option4'],
+                    ['echarts_theme'],
+                    ['graph_type'],
+                    ['smooths', 'data_zoom'],
                 ]
             },
         ],

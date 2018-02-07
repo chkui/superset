@@ -1,123 +1,193 @@
 import echarts from 'echarts';
 
+require('echarts/theme/dark.js');
+require('echarts/theme/infographic.js');
+require('echarts/theme/macarons.js');
+require('echarts/theme/roma.js');
+require('echarts/theme/shine.js');
+require('echarts/theme/vintage.js');
 
 function EchartsLineBasicVis(slice, payload) {
-    const div = d3.select(slice.selector);
-    var html = '<div id="e_line_basic" style="width: ' + slice.width() + ''
-        + 'px;height:' + slice.height() + 'px;">haha</div>';
-    div.html(html);
-
-    var myChart = echarts.init(document.getElementById('e_line_basic'));
-
-    var option = {
-        legend: {
-            data: []
-        },
-        xAxis: {
-            type: 'category',
-            data: []
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: []
-    };
-    myChart.setOption(option);
-
     const fd = slice.formData;
     const json = payload.data;
     const data = json;
+
+    const graph_id = "echarts_line" + fd.slice_id;
+    const graph_type = fd.graph_type;
+    const data_zoom = fd.dataZoom;
+    const theme = fd.echarts_theme;
+    let new_theme;
+    if (theme === 'default') {
+        new_theme = ''
+    }
+    else {
+        new_theme = fd.echarts_theme
+    }
+
+    const div = d3.select(slice.selector);
+    let html = '<div id=' + graph_id + ' style="width: ' + slice.width() + ' '
+        + 'px;height:' + slice.height() + 'px;"></div>';
+    div.html(html);
+
+    let myChart = echarts.init(document.getElementById(graph_id), new_theme);
+
     const records = data['records'];
     const data_column = data.columns;
     const metrics = fd.metrics;
     const smooth_type = fd.smooths;
-    const graph_type = fd.graph_type;
+    const label_info = {
+        show: true,
+        position: 'top'
+    };
+    const normal_y_axis = {
+        type: 'value'
+    };
+    const data_zoom_info = [
+        {
+            show: true,
+            realtime: true,
+            start: 65,
+            end: 85
+        },
+        {
+            type: 'inside',
+            realtime: true,
+            start: 65,
+            end: 85
+        }
+    ];
 
     var legend_name = [];
     var axis_name = [];
     var series_data = [];
-    var tmp_label = [];
+    let double_axis_info = [];
 
-    for (var i = 0; i < records.length; i++) {
+    for (let i = 0; i < records.length; i++) {
         axis_name.push(records[i][data_column[0]]);
     }
 
-    for (var i = 0; i < metrics.length; i++) {
+    for (let i = 0; i < metrics.length; i++) {
+
         legend_name.push(metrics[i]);
-        var tmp_data = [];
-        for (var j = 0; j < records.length; j++) {
+        let tmp_data = [];
+        for (let j = 0; j < records.length; j++) {
             tmp_data.push(records[j][metrics[i]]);
         }
-        switch (graph_type) {
-            case 'Basic': {
-                if (smooth_type) {
-                    series_data.push(
-                        {
-                            name: legend_name[i],
-                            type: 'line',
-                            smooth: true,
-                            data: tmp_data
-                        }
-                    )
-                }
-                else {
-                    series_data.push(
-                        {
-                            name: legend_name[i],
-                            type: 'line',
-                            data: tmp_data
-                        }
-                    )
-                }
-                break;
+
+        function LabelInsert(item) {
+            if (item === metrics.length - 1) {
+                return label_info
+            } else {
+                return {}
             }
-            case 'Stack': {
-                switch (i) {
-                    case metrics.length - 1:
-                        tmp_label.push({
-                            normal: {
-                                show: true,
-                                position: 'top'
-                            }
-                        });
-                        break;
-                    default:
-                        tmp_label.push({normal: {}});
-                }
+        }
+
+        function DoubleAxisInverse(item) {
+            if (item === metrics.length - 1) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        function DoubleAxisNameLocation(item) {
+            if (item === metrics.length - 1) {
+                return 'start'
+            }
+        }
+
+
+        switch (graph_type) {
+            case 'Basic':
+                series_data.push(
+                    {
+                        name: legend_name[i],
+                        type: 'line',
+                        smooth: smooth_type,
+                        data: tmp_data
+                    }
+                );
+                break;
+            case 'Stack':
                 series_data.push(
                     {
                         name: legend_name[i],
                         type: 'line',
                         stack: '总量',
-
-                        label: tmp_label[i],
-                        areaStyle: {normal: {}},
+                        smooth: smooth_type,
+                        label: {
+                            normal: LabelInsert(i)
+                        },
                         data: tmp_data
                     }
                 );
                 break;
-            }
-            default: {
-                if (smooth_type) {
-                    series_data.push(
-                        {
-                            name: legend_name[i],
-                            type: 'line',
-                            smooth: true,
-                            data: tmp_data
+            case 'StackArea':
+                series_data.push(
+                    {
+                        name: legend_name[i],
+                        type: 'line',
+                        stack: '总量',
+                        smooth: smooth_type,
+                        label: {
+                            normal: LabelInsert(i)
+                        },
+                        areaStyle: {
+                            normal: {}
+                        },
+                        data: tmp_data
+                    }
+                );
+                break;
+            case 'Area Double Axis':
+                series_data.push({
+                    name: legend_name[i],
+                    type: 'line',
+                    animation: false,
+                    yAxisIndex: i,
+                    areaStyle: {
+                        normal: {}
+                    },
+                    lineStyle: {
+                        normal: {
+                            width: 1
                         }
-                    )
-                }
-                else {
-                    series_data.push(
-                        {
-                            name: legend_name[i],
-                            type: 'line',
-                            data: tmp_data
-                        }
-                    )
-                }
-            }
+                    },
+                    markArea: {
+                        silent: true,
+                        data: [[{
+                            xAxis: '2009/9/12\n7:00'
+                        }, {
+                            xAxis: '2009/9/22\n7:00'
+                        }]]
+                    },
+                    data: tmp_data
+                });
+                double_axis_info.push({
+                    name: legend_name[i],
+                    type: 'value',
+                    inverse: DoubleAxisInverse(i),
+                    nameLocation: DoubleAxisNameLocation(i)
+                });
+                break;
+        }
+    }
+
+    function YAxisType(graph_type) {
+        switch (graph_type) {
+            case 'Area Double Axis':
+                return double_axis_info;
+
+                break;
+            default:
+                return normal_y_axis;
+        }
+    }
+    function DataZoomType(data_zoom) {
+        if (data_zoom) {
+            return {dataZoom: data_zoom_info};
+        }else {
+            return {}
         }
     }
 
@@ -125,12 +195,19 @@ function EchartsLineBasicVis(slice, payload) {
         legend: {
             data: legend_name
         },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
         xAxis: {
+            type: 'category',
             data: axis_name
         },
-        series: series_data
+        yAxis: YAxisType(graph_type),
+        series: series_data,
     };
-
     myChart.setOption(option2);
 }
 
